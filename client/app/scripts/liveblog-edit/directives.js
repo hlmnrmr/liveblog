@@ -189,7 +189,7 @@ define([
                     link: function(scope, elem, attrs) {
                         angular.extend(scope, {
                             isAbleToEditContribution: function(post) {
-                                return blogSecurityService.canPublishAPost() || blogSecurityService.isUserOwner(post);
+                                return blogSecurityService.canPublishAPost() || blogSecurityService.accessToSettings(post);
                             },
                             toggleMultipleItems: function() {
                                 scope.show_all = !scope.show_all;

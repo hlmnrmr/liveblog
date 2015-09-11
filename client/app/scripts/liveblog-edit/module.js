@@ -461,8 +461,14 @@ define([
         function canPublishAPost(blog) {
             return privileges.userHasPrivileges({'publish_post': 1});
         }
-        function isUserOwner(archive) {
-            if ($rootScope.currentUser._id === archive.original_creator || $rootScope.currentUser.user_type === 'administrator') {
+        function accessToSettings(archive) {
+            //if no role assigned, assume no restriction from the role POV
+            var rolePermission = true;
+            if ($rootScope.currentUser.role) {
+                rolePermission = rolePermission && privileges.userHasPrivileges({'blogs': 1});
+            }
+            if (($rootScope.currentUser._id === archive.original_creator && rolePermission) ||
+                $rootScope.currentUser.user_type === 'administrator') {
                 return true;
             } else {
                 return false;
@@ -472,7 +478,7 @@ define([
             var def = $q.defer();
             blogService.get($route.current.params._id)
             .then(function(response) {
-                if (isUserOwner(response)) {
+                if (accessToSettings(response)) {
                     def.resolve();
                 } else {
                     def.reject();
@@ -486,7 +492,7 @@ define([
         }
         return {
             goToSettings: goToSettings,
-            isUserOwner: isUserOwner,
+            accessToSettings: accessToSettings,
             canPublishAPost: canPublishAPost
         };
     }]);
